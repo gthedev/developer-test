@@ -6,11 +6,6 @@ use Tests\TestCase;
 
 class CSVGeneratorTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
     public function test_it_generates_csv_correctly()
     {
         $response = $this->post(

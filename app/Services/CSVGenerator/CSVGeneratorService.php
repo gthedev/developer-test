@@ -6,7 +6,7 @@ namespace App\Services\CSVGenerator;
 
 class CSVGeneratorService
 {
-    public function generate(array $rows, array $headings)
+    public function generate(array $rows, array $headings): string
     {
         ob_start();
 

@@ -7,8 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class CSVGeneratorTest extends TestCase
 {
-    /** @var CSVGeneratorService */
-    private $service;
+    private CSVGeneratorService $service;
 
     protected function setUp(): void
     {

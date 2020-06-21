@@ -13,7 +13,6 @@ class CsvExportController extends Controller
      * Converts the user input into a CSV file and streams the file back to the user
      *
      * @param  Request  $request
-     *
      * @param  CSVGeneratorService  $service
      *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
