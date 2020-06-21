@@ -9,26 +9,38 @@
                         <table class="table table-bordered">
                             <thead>
                             <tr>
-                                <th v-for="column in columns">
+                                <th v-for="(column, columnIndex) in columns">
                                     <input type="text"
                                            class="form-control"
-                                           :value="column.key"
-                                           @input="updateColumnKey(column, $event)"
+                                           v-model="column.key"
                                     />
+
+                                    <button type="button" class="btn btn-danger btn-sm" tabindex="-1"
+                                            @click="removeColumn(columnIndex)">
+                                        remove column
+                                    </button>
                                 </th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="row in data">
-                                <td v-for="(dataColumn, columnName) in row">
-                                    <input type="text" class="form-control" v-model="row[columnName]"/>
+                            <tr v-for="(row, rowIndex) in rows">
+                                <td v-for="(columnName, columnIndex) in columns">
+                                    <input type="text" class="form-control" v-model="row[columnIndex]"/>
                                 </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                            tabindex="-1"
+                                            @click="removeRow(rowIndex)">
+                                        remove row
+                                    </button>
+                                </td>
+                            </tr>
                             </tr>
                             </tbody>
                         </table>
 
-                        <button type="button" class="btn btn-secondary">Add Column</button>
-                        <button type="button" class="btn btn-secondary">Add Row</button>
+                        <button type="button" class="btn btn-secondary" @click="addColumn">Add Column</button>
+                        <button type="button" class="btn btn-secondary" @click="addRow">Add Row</button>
                     </div>
 
                     <div class="card-footer text-right">
@@ -47,70 +59,39 @@
 
         data() {
             return {
-                data: [
-                    {
-                        first_name: 'John',
-                        last_name: 'Doe',
-                        emailAddress: 'john.doe@example.com'
-                    },
-                    {
-                        first_name: 'John',
-                        last_name: 'Doe',
-                        emailAddress: 'john.doe@example.com'
-                    },
-
+                rows: [
+                    ['John', 'Doe', 'john.doe@example.com'],
+                    ['John 2', 'Doe 2'],
                 ],
                 columns: [
-                    {key: 'first_name'},
-                    {key: 'last_name'},
+                    {key: 'firstName'},
+                    {key: 'lastName'},
                     {key: 'emailAddress'},
-
                 ]
             }
         },
 
         methods: {
-            add_row() {
-                // Add new row to data with column keys
+            addRow() {
+                this.rows.push([]);
             },
 
-            remove_row(row_index) {
-                // remove the given row
+            removeRow(rowIndex) {
+                this.rows.splice(rowIndex, 1);
             },
 
-            add_column() {
-
+            addColumn() {
+                this.columns.push({key: ''});
             },
 
-            updateColumnKey(column, event) {
-                let oldKey = column.key;
-
-                let columnKeyExists = !!this.columns.find(column => column.key === event.target.value);
-
-                column.key = event.target.value;
-
-                if (columnKeyExists) {
-                    column.key = event.target.value.substring(0, event.target.value.length - 1);
-                    return;
-                }
-
-                this.data.forEach(
-                    (row) => {
-                        if (row[oldKey]) {
-                            row[column.key] = row[oldKey];
-                            delete row[oldKey];
-                        }
-                    }
-                )
+            removeColumn(columnIndex) {
+                this.columns.splice(columnIndex, 1);
             },
 
             submit() {
                 return axios.patch('/api/csv-export', this.data);
             }
         },
-
-        watch: {
-        }
     }
 </script>
 

@@ -1951,58 +1951,51 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "CSVGenerator",
   data: function data() {
     return {
-      data: [{
-        first_name: 'John',
-        last_name: 'Doe',
-        emailAddress: 'john.doe@example.com'
-      }, {
-        first_name: 'John',
-        last_name: 'Doe',
-        emailAddress: 'john.doe@example.com'
-      }],
+      rows: [['John', 'Doe', 'john.doe@example.com'], ['John 2', 'Doe 2']],
       columns: [{
-        key: 'first_name'
+        key: 'firstName'
       }, {
-        key: 'last_name'
+        key: 'lastName'
       }, {
         key: 'emailAddress'
       }]
     };
   },
   methods: {
-    add_row: function add_row() {// Add new row to data with column keys
+    addRow: function addRow() {
+      this.rows.push([]);
     },
-    remove_row: function remove_row(row_index) {// remove the given row
+    removeRow: function removeRow(rowIndex) {
+      this.rows.splice(rowIndex, 1);
     },
-    add_column: function add_column() {},
-    updateColumnKey: function updateColumnKey(column, event) {
-      var oldKey = column.key;
-      var columnKeyExists = !!this.columns.find(function (column) {
-        return column.key === event.target.value;
+    addColumn: function addColumn() {
+      this.columns.push({
+        key: ''
       });
-      column.key = event.target.value;
-
-      if (columnKeyExists) {
-        column.key = event.target.value.substring(0, event.target.value.length - 1);
-        return;
-      }
-
-      this.data.forEach(function (row) {
-        if (row[oldKey]) {
-          row[column.key] = row[oldKey];
-          delete row[oldKey];
-        }
-      });
+    },
+    removeColumn: function removeColumn(columnIndex) {
+      this.columns.splice(columnIndex, 1);
     },
     submit: function submit() {
       return axios.patch('/api/csv-export', this.data);
     }
-  },
-  watch: {}
+  }
 });
 
 /***/ }),
@@ -56815,18 +56808,47 @@ var render = function() {
               _c("thead", [
                 _c(
                   "tr",
-                  _vm._l(_vm.columns, function(column) {
+                  _vm._l(_vm.columns, function(column, columnIndex) {
                     return _c("th", [
                       _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: column.key,
+                            expression: "column.key"
+                          }
+                        ],
                         staticClass: "form-control",
                         attrs: { type: "text" },
                         domProps: { value: column.key },
                         on: {
                           input: function($event) {
-                            return _vm.updateColumnKey(column, $event)
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(column, "key", $event.target.value)
                           }
                         }
-                      })
+                      }),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-danger btn-sm",
+                          attrs: { type: "button", tabindex: "-1" },
+                          on: {
+                            click: function($event) {
+                              return _vm.removeColumn(columnIndex)
+                            }
+                          }
+                        },
+                        [
+                          _vm._v(
+                            "\n                                    remove column\n                                "
+                          )
+                        ]
+                      )
                     ])
                   }),
                   0
@@ -56835,35 +56857,57 @@ var render = function() {
               _vm._v(" "),
               _c(
                 "tbody",
-                _vm._l(_vm.data, function(row) {
+                _vm._l(_vm.rows, function(row, rowIndex) {
                   return _c(
                     "tr",
-                    _vm._l(row, function(dataColumn, columnName) {
-                      return _c("td", [
-                        _c("input", {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: row[columnName],
-                              expression: "row[columnName]"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: { type: "text" },
-                          domProps: { value: row[columnName] },
-                          on: {
-                            input: function($event) {
-                              if ($event.target.composing) {
-                                return
+                    [
+                      _vm._l(_vm.columns, function(columnName, columnIndex) {
+                        return _c("td", [
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: row[columnIndex],
+                                expression: "row[columnIndex]"
                               }
-                              _vm.$set(row, columnName, $event.target.value)
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text" },
+                            domProps: { value: row[columnIndex] },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.$set(row, columnIndex, $event.target.value)
+                              }
                             }
-                          }
-                        })
+                          })
+                        ])
+                      }),
+                      _vm._v(" "),
+                      _c("td", [
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-danger btn-sm",
+                            attrs: { type: "button", tabindex: "-1" },
+                            on: {
+                              click: function($event) {
+                                return _vm.removeRow(rowIndex)
+                              }
+                            }
+                          },
+                          [
+                            _vm._v(
+                              "\n                                    remove row\n                                "
+                            )
+                          ]
+                        )
                       ])
-                    }),
-                    0
+                    ],
+                    2
                   )
                 }),
                 0
@@ -56872,13 +56916,21 @@ var render = function() {
             _vm._v(" "),
             _c(
               "button",
-              { staticClass: "btn btn-secondary", attrs: { type: "button" } },
+              {
+                staticClass: "btn btn-secondary",
+                attrs: { type: "button" },
+                on: { click: _vm.addColumn }
+              },
               [_vm._v("Add Column")]
             ),
             _vm._v(" "),
             _c(
               "button",
-              { staticClass: "btn btn-secondary", attrs: { type: "button" } },
+              {
+                staticClass: "btn btn-secondary",
+                attrs: { type: "button" },
+                on: { click: _vm.addRow }
+              },
               [_vm._v("Add Row")]
             )
           ]),
@@ -69273,8 +69325,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /home/kyle/fu3e/developer-test/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /home/kyle/fu3e/developer-test/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\wamp64\www\playground\f3-developer-test\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\wamp64\www\playground\f3-developer-test\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
