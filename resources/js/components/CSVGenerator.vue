@@ -35,7 +35,6 @@
                                     </button>
                                 </td>
                             </tr>
-                            </tr>
                             </tbody>
                         </table>
 
@@ -54,6 +53,8 @@
 </template>
 
 <script>
+    import FileSaver from 'file-saver';
+
     export default {
         name: "CSVGenerator",
 
@@ -68,6 +69,12 @@
                     {key: 'lastName'},
                     {key: 'emailAddress'},
                 ]
+            }
+        },
+
+        computed: {
+            headings() {
+                return this.columns.map(c => c.key);
             }
         },
 
@@ -89,7 +96,19 @@
             },
 
             submit() {
-                return axios.patch('/api/csv-export', this.data);
+                let data = {
+                    headings: this.columns.map(c => c.key),
+                    rows: this.rows,
+                };
+
+                axios.post('/api/csv-export', data)
+                    .then(({data}) => {
+                        this.downloadDataAsCSV(data);
+                    });
+            },
+
+            downloadDataAsCSV(data) {
+                FileSaver.saveAs(new Blob([data], {type: "text/csv"}), "csv-export.csv");
             }
         },
     }

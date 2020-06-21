@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+        <title>{{ config('app.name') }}</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
@@ -47,9 +47,3 @@
         <script src="{{ asset('/js/app.js') }}" type="text/javascript"></script>
     </body>
 </html>
-<script>
-    import CSVGenerator from "../js/components/CSVGenerator";
-    export default {
-        components: {CSVGenerator}
-    }
-</script>
