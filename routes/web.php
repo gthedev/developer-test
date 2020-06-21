@@ -14,5 +14,3 @@
 Route::get('/', function () {
     return view('home');
 });
-
-Route::post('csv-export', 'CsvExportController@convert');

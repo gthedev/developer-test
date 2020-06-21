@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Services\CSVGeneratorService;
+use App\Services\CSVGenerator\CSVGeneratorService;
 use PHPUnit\Framework\TestCase;
 
 class CSVGeneratorTest extends TestCase
@@ -16,16 +16,16 @@ class CSVGeneratorTest extends TestCase
         $this->service = resolve(CSVGeneratorService::class);
     }
 
-    public function test_it_generates_csv_correctly()
+    public function test_service_generates_csv_correctly()
     {
         $csvString = $this->service->generate(
             [
-                ['John', 'Doe', 'Email'],
+                ['John', 'Doe', 'email@example.com'],
             ],
             ['firstName', 'lastName', 'email']
         );
 
-        $stringShouldBe = "firstName,lastName,email\nJohn,Doe,Email\n";
+        $stringShouldBe = "firstName,lastName,email\nJohn,Doe,email@example.com\n";
 
         $this->assertEquals($stringShouldBe, $csvString);
     }

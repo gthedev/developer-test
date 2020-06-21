@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Services\CSVGeneratorService;
+use App\Services\CSVGenerator\CSVGeneratorService;
 use Illuminate\Http\Request;
 
 class CsvExportController extends Controller
