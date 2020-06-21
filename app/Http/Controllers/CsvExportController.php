@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Services\CSVGenerator\CSVGeneratorService;
+use App\Services\CSVGenerator\GeneratorOptions;
 use Illuminate\Http\Request;
 
 class CsvExportController extends Controller
@@ -23,10 +24,13 @@ class CsvExportController extends Controller
             [
                 'headings' => 'required|array',
                 'rows'     => 'required|array',
+                'options'  => 'array',
             ]
         );
 
-        $csv = $service->generate($request->input('rows'), $request->input('headings'));
+        $options = GeneratorOptions::fromArray($request->input('options', []));
+
+        $csv = $service->generate($request->input('rows'), $request->input('headings'), $options);
 
         return response()->streamDownload(
             function () use ($csv) {

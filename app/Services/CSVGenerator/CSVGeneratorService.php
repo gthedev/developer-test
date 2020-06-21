@@ -6,13 +6,19 @@ namespace App\Services\CSVGenerator;
 
 class CSVGeneratorService
 {
-    public function generate(array $rows, array $headings): string
+    public function generate(array $rows, array $headings, GeneratorOptions $options = null): string
     {
+        if (is_null($options)) {
+            $options = new GeneratorOptions(); // Default options
+        }
+
         ob_start();
 
         $handle = fopen('php://output', 'w');
 
-        fputcsv($handle, $headings);
+        if ($options->includeHeadings) {
+            fputcsv($handle, $headings);
+        }
 
         foreach ($rows as $row) {
             fputcsv($handle, $row);

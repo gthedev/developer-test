@@ -42,8 +42,16 @@
                         <button type="button" class="btn btn-secondary" @click="addRow">Add Row</button>
                     </div>
 
-                    <div class="card-footer text-right">
-                        <button class="btn btn-primary" type="button" @click="submit()">Export</button>
+                    <div class="card-footer">
+                        <div class="float-left">
+                            <label>
+                                <input type="checkbox" v-model="options.includeHeadings"/>
+                                Include headings
+                            </label>
+                        </div>
+                        <div class="float-right">
+                            <button class="btn btn-primary" type="button" @click="submit()">Export</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -68,7 +76,10 @@
                     {key: 'firstName'},
                     {key: 'lastName'},
                     {key: 'emailAddress'},
-                ]
+                ],
+                options: {
+                    includeHeadings: true,
+                }
             }
         },
 
@@ -99,6 +110,7 @@
                 let data = {
                     headings: this.columns.map(c => c.key),
                     rows: this.rows,
+                    options: this.options,
                 };
 
                 axios.post('/api/csv-export', data)
