@@ -134,6 +134,15 @@
 
             removeColumn(columnIndex) {
                 this.columns.splice(columnIndex, 1);
+
+                // Tidy up the data
+                this.rows = this.rows.map(row => {
+                    if (row.length >= columnIndex - 1) {
+                        row.splice(columnIndex, 1);
+                    }
+
+                    return row;
+                });
             },
 
             submit() {
