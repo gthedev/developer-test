@@ -137,7 +137,7 @@
 
                 // Tidy up the data
                 this.rows = this.rows.map(row => {
-                    if (row.length >= columnIndex - 1) {
+                    if (row.length >= columnIndex + 1) {
                         row.splice(columnIndex, 1);
                     }
 
