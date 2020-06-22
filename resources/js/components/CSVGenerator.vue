@@ -1,63 +1,85 @@
 <template>
     <div class="container">
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">Table to CSV Generator</div>
-
-                    <div class="card-body">
-                        <table class="table table-bordered">
-                            <thead>
-                            <tr>
-                                <th v-for="(column, columnIndex) in columns">
-                                    <input type="text"
-                                           class="form-control"
-                                           v-model="column.key"
-                                    />
-
-                                    <button type="button" class="btn btn-danger btn-sm" tabindex="-1"
-                                            @click="removeColumn(columnIndex)">
-                                        remove column
-                                    </button>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="(row, rowIndex) in rows">
-                                <td v-for="(columnName, columnIndex) in columns">
-                                    <input type="text" class="form-control" v-model="row[columnIndex]"/>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-danger btn-sm"
-                                            tabindex="-1"
-                                            @click="removeRow(rowIndex)">
-                                        remove row
-                                    </button>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-
-                        <button type="button" class="btn btn-secondary" @click="addColumn">Add Column</button>
-                        <button type="button" class="btn btn-secondary" @click="addRow">Add Row</button>
-                    </div>
-
-                    <div class="card-footer">
-                        <div class="float-left">
-                            <label>
-                                <input type="checkbox" v-model="options.includeHeadings"/>
-                                Include headings
-                            </label>
+        <div id="csv-generator">
+            <table class="table table-striped" ref="table">
+                <thead>
+                <tr>
+                    <th v-for="(column, columnIndex) in columns">
+                        <div class="row">
+                            <div class="col-10">
+                                <input type="text"
+                                       class="form-control"
+                                       v-model="column.key"
+                                />
+                            </div>
+                            <div class="col-2">
+                                <button type="button" class="btn text-danger btn-sm btn-round float-right" tabindex="-1"
+                                        @click="removeColumn(columnIndex)"
+                                        title="Remove column"
+                                >
+                                    <b-icon icon="trash"></b-icon>
+                                </button>
+                            </div>
                         </div>
-                        <div class="float-right">
-                            <button class="btn btn-primary" type="button" @click="submit()">Export</button>
-                        </div>
-                    </div>
-                </div>
+                    </th>
+                    <th class="text-center">
+                        <button type="button" class="btn btn-success btn-sm btn-round" @click="addColumn"
+                                tabindex="-1"
+                                title="Add new column"
+                        >
+                            <b-icon icon="plus"></b-icon>
+                        </button>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(row, rowIndex) in rows" :key="`row-${rowIndex}`">
+                    <td v-for="(column, columnIndex) in columns">
+                        <input type="text" class="form-control" v-model="row[columnIndex]"
+                               v-b-tooltip.focus
+                               :title="column.key"
+                        />
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn text-danger btn-sm btn-round"
+                                tabindex="-1"
+                                @click="removeRow(rowIndex)"
+                                title="Delete row"
+                        >
+                            <b-icon icon="trash"></b-icon>
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="text-center">
+                <button type="button" class="btn btn-success btn-sm btn-round" @click="addRow">
+                    <b-icon icon="plus"></b-icon>
+                    Add new row
+                </button>
             </div>
+
+            <div class="well mt-5 mb-4">
+                <strong>Generator Options</strong>
+                <hr/>
+                <label>
+                    <input type="checkbox" v-model="options.includeHeadings"/>
+                    Include headings
+                </label>
+            </div>
+
+            <button class="btn btn-primary btn-block btn-round btn-lg" type="button" @click="submit()"
+                    :disabled="loading">
+                <template v-if="loading">
+                    <b-spinner></b-spinner>
+                </template>
+                <template v-else>
+                    Export
+                </template>
+            </button>
         </div>
     </div>
-
 </template>
 
 <script>
@@ -68,15 +90,17 @@
 
         data() {
             return {
+                loading: false,
+
                 rows: [
                     ['John', 'Doe', 'john.doe@example.com'],
-                    ['John 2', 'Doe 2'],
                 ],
                 columns: [
-                    {key: 'firstName'},
-                    {key: 'lastName'},
-                    {key: 'emailAddress'},
+                    {key: 'First Name'},
+                    {key: 'Last Name'},
+                    {key: 'Email'},
                 ],
+
                 options: {
                     includeHeadings: true,
                 }
@@ -92,6 +116,12 @@
         methods: {
             addRow() {
                 this.rows.push([]);
+
+                this.$nextTick(() => this.focusOnLastRow());
+            },
+
+            focusOnLastRow() {
+                this.$refs.table.querySelector('tbody tr:last-child td:first-child input').focus();
             },
 
             removeRow(rowIndex) {
@@ -99,7 +129,7 @@
             },
 
             addColumn() {
-                this.columns.push({key: ''});
+                this.columns.push({key: 'Column Name'});
             },
 
             removeColumn(columnIndex) {
@@ -107,6 +137,8 @@
             },
 
             submit() {
+                this.loading = true;
+
                 let data = {
                     headings: this.columns.map(c => c.key),
                     rows: this.rows,
@@ -116,6 +148,15 @@
                 axios.post('/api/csv-export', data)
                     .then(({data}) => {
                         this.downloadDataAsCSV(data);
+                    })
+                    .catch(error => {
+                        console.error(error);
+
+                        // @todo here we can (1) add nicer alert, like Toasted and (2) extract actual message depending on what errors we can realistically expect
+                        alert('Something went wrong! Please try again');
+                    })
+                    .finally(() => {
+                        this.loading = false;
                     });
             },
 
@@ -126,6 +167,6 @@
     }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
 </style>

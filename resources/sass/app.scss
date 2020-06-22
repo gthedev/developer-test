@@ -1,1 +1,68 @@
-//
+@import '~bootstrap/scss/bootstrap';
+@import '~bootstrap-vue/src/index';
+
+body {
+  background: #eee url('/images/bg.png') repeat;
+  color: #444;
+}
+
+#csv-generator {
+  table {
+    border-radius: 5px;
+    background: #fff;
+    overflow: hidden;
+    border: 0;
+    box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.15);
+
+    td, th {
+      padding: 0;
+
+      input {
+        border: 0;
+        border-radius: 0;
+        font-size: 14px;
+        padding: 13px;
+        height: auto;
+        background: none;
+        transition: all 0.2s;
+      }
+
+      button {
+        margin: 8px;
+      }
+    }
+
+    td {
+      transition: all 1s;
+
+      input {
+        &:focus {
+          outline: none;
+          background: #eaf8ff;
+          box-shadow: none;
+        }
+      }
+    }
+
+    th {
+      border-bottom: 3px solid black;
+      background: #333;
+
+      input {
+        color: #eee;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .well {
+    padding: 15px;
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.btn-round {
+  border-radius: 100px;
+}
